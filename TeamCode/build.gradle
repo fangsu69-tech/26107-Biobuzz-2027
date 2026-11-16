@@ -1,5 +1,3 @@
-apply plugin: 'com.android.application'
-
 //
 // build.gradle in TeamCode
 //
@@ -10,6 +8,7 @@ apply plugin: 'com.android.application'
 // please think carefully as to whether such customizations are really necessary
 // before doing so.
 
+
 // Custom definitions may go here
 
 // Include common definitions from above.
@@ -18,6 +17,11 @@ apply from: '../build.dependencies.gradle'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
+
+    compileSdk 35
+    defaultConfig {
+        minSdk 24
+    }
 
     packagingOptions {
         jniLibs.useLegacyPackaging true
