@@ -10,8 +10,6 @@ public class IntakeSubsystem {
     private DcMotor intakeMotor;
     private CRServo transferServo1, transferServo2;
     public static double intakeSpeed = 0.8;
-
-
     public void initialize(com.qualcomm.robotcore.hardware.HardwareMap hwMap) {
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -36,18 +34,13 @@ public class IntakeSubsystem {
     public void runTransfer(){
         transferServo1.setPower(-1);
         transferServo2.setPower(1);
-
     }
-
     public void retractTransfer(){
         transferServo1.setPower(1);
         transferServo2.setPower(-1);
     }
-
     public void stopTransfer() {
         transferServo1.setPower(0);
         transferServo2.setPower(0);
     }
-
 }
-
