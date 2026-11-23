@@ -68,6 +68,7 @@ public class DriveSubsystem {
         br.setDirection(DcMotorEx.Direction.REVERSE);
         fl.setDirection(DcMotorEx.Direction.REVERSE);
         bl.setDirection(DcMotorEx.Direction.REVERSE);
+        fr.setDirection(DcMotorEx.Direction.REVERSE);
 
         // Pinpoint Setup
         odo = hwMap.get(GoBildaPinpointDriver.class, "pinpoint");
