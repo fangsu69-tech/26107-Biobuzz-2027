@@ -1,0 +1,9 @@
+T = ticks
+Rot = rotation
+Sec = seconds
+rpm = rotation per minute
+PID stuff:
+kP = proportional gain
+kI = integral gain
+kD = derivative gain
+kF = feedforward gain

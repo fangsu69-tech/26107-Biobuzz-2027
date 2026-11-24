@@ -1,0 +1,27 @@
+package org.firstinspires.ftc.teamcode.subsystems;
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.configurables.annotations.Sorter;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import org.firstinspires.ftc.teamcode.utils.PIDController;
+import org.firstinspires.ftc.teamcode.utils.TelemetryUtils;
+
+@Configurable
+public class TwoShooterSubsystem {
+    //configure the 2 motors
+    private DcMotorEx PollenMotor;
+    private DcMotorEx NectorMotor;
+
+    //PID for later
+    private PIDController velocityPID;
+
+    //constants, need adjustements
+
+    private final double TPerRot = 28;
+    private double TargetTPerSec = 0;
+    private long StateTransitionTime = 0;
+    private boolean LastReadyState = false;
+    @Sorter(sort = 0) static double kP = 0.005, kI = 0.01, kD = 0.0002, kF = 0.0005;
+    @Sorter(sort = 1) static double rpmToletance = 200;
+}
