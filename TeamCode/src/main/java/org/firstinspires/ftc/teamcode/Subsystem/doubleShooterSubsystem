@@ -24,4 +24,28 @@ public class TwoShooterSubsystem {
     private boolean LastReadyState = false;
     @Sorter(sort = 0) static double kP = 0.005, kI = 0.01, kD = 0.0002, kF = 0.0005;
     @Sorter(sort = 1) static double rpmToletance = 200;
+
+
+    public void initialize(com.qualcomm.robotcore.hardware.HardwareMap hwMap) {
+        PollenMotor = hwMap.get(DcMotorEx.class, "PollenMotor");
+        NectorMotor = hwMap.get(DcMotorEx.class, "NectoerMotor");
+
+        PollenMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        PollenMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        PollenMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        NectorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        NectorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        NectorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        velocityPID = new PIDController(kP, kI, kD);
+        velocityPID.setOutputMax(1.0);
+    }
+
+    // desired RPM --> T/Sec
+
+    public void setRPM(double rpm){
+        this.TargetTPerSec = (rpm * TPerRot)/60;
+        TelemetryUtils.addData("targetRPM", rpm)
+    }
 }
