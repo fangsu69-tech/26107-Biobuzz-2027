@@ -28,15 +28,15 @@ public class TwoShooterSubsystem {
 
     public void initialize(com.qualcomm.robotcore.hardware.HardwareMap hwMap) {
         PollenMotor = hwMap.get(DcMotorEx.class, "PollenMotor");
-        NectorMotor = hwMap.get(DcMotorEx.class, "NectoerMotor");
+        NectarMotor = hwMap.get(DcMotorEx.class, "NectarMotor");
 
         PollenMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         PollenMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         PollenMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        NectorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        NectorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        NectorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        NectarMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        NectarMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        NectarMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         velocityPID = new PIDController(kP, kI, kD);
         velocityPID.setOutputMax(1.0);
@@ -48,4 +48,28 @@ public class TwoShooterSubsystem {
         this.TargetTPerSec = (rpm * TPerRot)/60;
         TelemetryUtils.addData("targetRPM", rpm)
     }
+
+    public void runPollen() {//PID stuff for the pollen shooter
+        double currentTPerSecPollen = PollenMotor.getVelocity(); // ticks per second
+
+        double feedforward = targetTicksPerSec * kF;
+        double pidCorrectionPollen = velocityPID.output(targetTicksPerSec, currentTPerSecPollen);
+
+        double totalPowerPollen = feedforward + pidCorrectionPollen;
+
+        PollenMotor.setPower(totalPowerPollen);
+    }
+//grammer is important, wouldve been bad if i realised that its nectar and not nector when i finish coding
+    public void runNectar() {//PID stuff for the nectar shooter
+        double currentTicksPerSecNectar = NectarMotor.getVelocity(); // ticks per second
+
+        double feedforward = targetTicksPerSec * kF;
+        double pidCorrectionNectar = velocityPID.output(targetTicksPerSec, currentTicksPerSecNectar);
+
+        double totalPowerNectar = feedforward + pidCorrectionNectar;
+
+        NectarMotor.setPower(totalPowerNectar);
+    }
+
+
 }
