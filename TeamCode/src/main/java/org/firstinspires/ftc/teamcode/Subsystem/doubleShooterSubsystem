@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.configurables.annotations.Sorter;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,9 +22,10 @@ public class TwoShooterSubsystem {
     private final double TPerRot = 28;
     private double TargetTPerSec = 0;
     private long StateTransitionTime = 0;
-    private boolean LastReadyState = false;
+    private boolean LastReadyStatePollen = false;
+    private boolean LastReadyStateNectar = false;
     @Sorter(sort = 0) static double kP = 0.005, kI = 0.01, kD = 0.0002, kF = 0.0005;
-    @Sorter(sort = 1) static double rpmToletance = 200;
+    @Sorter(sort = 1) static double rpmTolerance = 200;
 
 
     public void initialize(com.qualcomm.robotcore.hardware.HardwareMap hwMap) {
@@ -44,16 +46,20 @@ public class TwoShooterSubsystem {
 
     // desired RPM --> T/Sec
 
-    public void setRPM(double rpm){
-        this.TargetTPerSec = (rpm * TPerRot)/60;
-        TelemetryUtils.addData("targetRPM", rpm)
+    public void setRPMPollen(double rpmPollen){
+        this.TargetTPerSec = (rpmPollen * TPerRot)/60;
+        TelemetryUtils.addData("targetRPM", rpmPollen)
+    }
+    public void setRPMNectar(double rpmNectar){
+        this.TargetTPerSec = (rpmNectar * TPerRot)/60;
+        TelemetryUtils.addData("targetRPM", rpmNectar)
     }
 
     public void runPollen() {//PID stuff for the pollen shooter
         double currentTPerSecPollen = PollenMotor.getVelocity(); // ticks per second
 
-        double feedforward = targetTicksPerSec * kF;
-        double pidCorrectionPollen = velocityPID.output(targetTicksPerSec, currentTPerSecPollen);
+        double feedforward = targetTPerSec * kF;
+        double pidCorrectionPollen = velocityPID.output(TargetTPerSec, currentTPerSecPollen);
 
         double totalPowerPollen = feedforward + pidCorrectionPollen;
 
@@ -63,13 +69,79 @@ public class TwoShooterSubsystem {
     public void runNectar() {//PID stuff for the nectar shooter
         double currentTicksPerSecNectar = NectarMotor.getVelocity(); // ticks per second
 
-        double feedforward = targetTicksPerSec * kF;
-        double pidCorrectionNectar = velocityPID.output(targetTicksPerSec, currentTicksPerSecNectar);
+        double feedforward = TargetTPerSec * kF;
+        double pidCorrectionNectar = velocityPID.output(TargetTPerSec, currentTicksPerSecNectar);
 
         double totalPowerNectar = feedforward + pidCorrectionNectar;
 
         NectarMotor.setPower(totalPowerNectar);
     }
+    //stops you from firing if its not the correct RPM
+    public boolean isReadyToFirePollen() {
+        // If the target is 0, we aren't "ready" to fire
+        if (TargetTPerSec == 0) return false;
 
+        double currentRPMPollen = getCurrentRPM();
+        double targetRPM = (TargetTPerSec * 60.0) / TPerRot;
 
+        return Math.abs(currentRPMPollen - targetRPM) < RPMTolerance;
+    }
+    public boolean isReadyToFireNectar() {
+        // If the target is 0, we aren't "ready" to fire
+        if (TargetTPerSec == 0) return false;
+
+        double currentRPMNectar = getCurrentRPM();
+        double targetRPM = (TargetTPerSec * 60.0) / TPerRot;
+
+        return Math.abs(currentRPMNectar - targetRPM) < RPMTolerance;
+    }
+/*
+i barely understand this code, i'll check if we need it or not
+might be usefull once i find what system.currenttimemillis is and where it is
+its probablly not completly ready to deploy as is
+    // will probably be used for autos and the such when ensuring a good shot is necessary
+    public boolean isStableReadyToFirePollen() {
+        boolean currentlyReadyPollen = isReadyToFirePollen();
+
+        // If state changed, reset the timer
+        if (currentlyReadyPollen != lastReadyStatePollen) {
+            stateTransitionTime = System.currentTimeMillis();
+            lastReadyStatePollen = currentlyReadyPollen;
+        }
+        // Only return true if it's been ready for more than 50ms
+        return currentlyReadyPollen && (System.currentTimeMillis() - stateTransitionTime > 50);
+
+        public boolean isStableReadyToFireNectar() {
+            boolean currentlyReadyNectar = isReadyToFirePollen();
+
+            // If state changed, reset the timer
+            if (currentlyReadyNectar != lastReadyStateNectar) {
+                stateTransitionTime = System.currentTimeMillis();
+                lastReadyStateNectar = currentlyReadyNectar;
+            }
+            // Only return true if it's been ready for more than 50ms
+            return currentlyReadyNectar && (System.currentTimeMillis() - stateTransitionTime > 50);
+ */
+
+    public void stopPollen() {
+        setRPMPollen(););
+        PollenMotor.setPower(0);
+        velocityPID.reset(); // Clear integral sum when stopping
+        TelemetryUtils.addData("targetRPMPollen", 0);
+    }
+
+    public void stopNectar() {
+        setRPMNectar(0);
+        NectarMotor.setPower(0);
+        velocityPID.reset(); // Clear integral sum when stopping
+        TelemetryUtils.addData("targetRPMNectar", 0);
+    }
+
+    // Helps to see how close you are to your target in Telemetry
+    public double getCurrentRPMPollen() {
+        return (PollenMotor.getVelocity() * 60.0) / TPerRot;
+    }
+    public double getCurrentRPMNectar() {
+        return (NectorMotor.getVelocity() * 60.0) / TPerRot;
+    }
 }

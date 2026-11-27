@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.utils;
 
-
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.configurables.annotations.Configurable;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
@@ -19,12 +17,10 @@ public class TelemetryUtils {
         dsTelemetry.setMsTransmissionInterval(50);
     }
 
-
     public static void addData(String key, Object value) {
         if (dsTelemetry != null) dsTelemetry.addData(key, value);
         if (dashboardTelemetry != null) dashboardTelemetry.addData(key, value);
     }
-
 
 
     public static void debug(String line) {
@@ -42,7 +38,6 @@ public class TelemetryUtils {
             if (dashboardTelemetry != null) dashboardTelemetry.debug(key, value);
         }
     }
-
 
     public static void update() {
         if (dsTelemetry != null) dsTelemetry.update();
